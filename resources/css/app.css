@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --brand-navy: #0b2d4d;
+    --brand-blue: #075aa5;
+    --brand-gold: #d7a72f;
+    --ink: #102033;
+    --muted: #64748b;
+    --line: #dbe7f3;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        color: var(--ink);
+        background:
+            linear-gradient(135deg, rgba(247, 251, 255, 0.96), rgba(236, 244, 252, 0.94)),
+            repeating-linear-gradient(90deg, rgba(11, 45, 77, 0.035) 0 1px, transparent 1px 52px);
+        min-height: 100vh;
+    }
+
+    ::selection {
+        @apply bg-amber-200 text-slate-950;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .page-shell {
+        @apply py-8 sm:py-10;
+    }
+
+    .page-container {
+        @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .page-container-narrow {
+        @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+    }
+
+    .page-kicker {
+        @apply text-xs font-bold uppercase tracking-widest text-amber-600;
+    }
+
+    .page-title {
+        @apply text-2xl sm:text-3xl font-bold tracking-tight text-slate-950;
+    }
+
+    .page-subtitle {
+        @apply mt-2 text-sm sm:text-base leading-relaxed text-slate-600;
+    }
+
+    .surface {
+        @apply bg-white/90 border border-slate-200 rounded-lg shadow-sm;
+    }
+
+    .surface-soft {
+        @apply bg-slate-50/80 border border-slate-200 rounded-lg;
+    }
+
+    .panel-header {
+        @apply px-4 py-4 sm:px-6 sm:py-5 border-b border-slate-200;
+    }
+
+    .panel-body {
+        @apply p-4 sm:p-6;
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-brand-blue px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 disabled:opacity-50;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-white px-4 py-2.5 text-sm font-semibold text-brand-blue shadow-sm transition hover:border-brand-blue hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 disabled:opacity-50;
+    }
+
+    .btn-muted {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 disabled:opacity-50;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg border border-transparent bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50;
+    }
+
+    .field-label {
+        @apply mb-1.5 block text-sm font-semibold text-slate-700;
+    }
+
+    .field-control {
+        @apply w-full rounded-lg border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 shadow-sm transition placeholder:text-slate-400 focus:border-brand-blue focus:ring-brand-blue;
+    }
+
+    .table-wrap {
+        @apply overflow-x-auto rounded-lg border border-slate-200 bg-white;
+    }
+
+    .data-table {
+        @apply min-w-full divide-y divide-slate-200 text-sm;
+    }
+
+    .data-table thead {
+        @apply bg-slate-50;
+    }
+
+    .data-table th {
+        @apply px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-500;
+    }
+
+    .data-table td {
+        @apply px-4 py-3 text-slate-700;
+    }
+
+    .data-table tbody {
+        @apply divide-y divide-slate-100;
+    }
+
+    .data-table tbody tr {
+        @apply transition hover:bg-blue-50/40;
+    }
+
+    .status-pill {
+        @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    .empty-state {
+        @apply rounded-lg border border-dashed border-slate-300 bg-slate-50/70 px-4 py-8 text-center text-sm text-slate-500;
+    }
+
+    .logo-mark {
+        @apply h-10 w-10 rounded-lg bg-white object-contain p-1.5 shadow-sm ring-1 ring-slate-200;
+    }
+}
