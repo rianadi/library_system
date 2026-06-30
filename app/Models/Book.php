@@ -10,6 +10,7 @@ class Book extends Model
     use HasFactory;
 
     protected $fillable = [
+        'book_code',
         'title',
         'author',
         'isbn',
@@ -28,6 +29,28 @@ class Book extends Model
         'total_copies' => 'integer',
         'available_copies' => 'integer',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (Book $book): void {
+            if (! $book->book_code) {
+                $book->forceFill([
+                    'book_code' => static::codeForId($book->id),
+                ])->saveQuietly();
+            }
+        });
+
+        static::saving(function (Book $book): void {
+            if ($book->exists && ! $book->book_code) {
+                $book->book_code = static::codeForId($book->id);
+            }
+        });
+    }
+
+    public static function codeForId(int $id): string
+    {
+        return 'BK'.str_pad((string) $id, 6, '0', STR_PAD_LEFT);
+    }
 
     public function category()
     {

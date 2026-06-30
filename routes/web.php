@@ -35,6 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Books Management
         Route::get('/admin/books/create', [BookController::class, 'create'])->name('books.create');
         Route::post('/admin/books', [BookController::class, 'store'])->name('books.store');
+        Route::post('/admin/books/import', [BookController::class, 'import'])->name('books.import');
+        Route::get('/admin/books/{book}/barcode', [BookController::class, 'printBarcode'])->name('books.barcode.print');
         Route::get('/admin/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
         Route::put('/admin/books/{book}', [BookController::class, 'update'])->name('books.update');
         Route::delete('/admin/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
@@ -45,10 +47,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Loans Management
         Route::get('/admin/loans', [LoanController::class, 'index'])->name('loans.index');
+        Route::post('/admin/loans/offline', [LoanController::class, 'storeOffline'])->name('loans.offline.store');
         Route::post('/admin/loans/{loan}/approve', [LoanController::class, 'approve'])->name('loans.approve');
         Route::post('/admin/loans/{loan}/reject', [LoanController::class, 'reject'])->name('loans.reject');
         Route::post('/admin/loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
         Route::post('/admin/loans/{loan}/extend', [LoanController::class, 'extend'])->name('loans.extend');
+
+        Route::get('/books/barcode/{code}', [BookController::class, 'findByBarcode'])
+            ->middleware('auth')
+            ->name('books.barcode.find');
 
         // Users Management
         Route::resource('users', UserController::class);

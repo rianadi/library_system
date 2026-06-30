@@ -10,7 +10,10 @@
                 Kembali ke katalog
             </a>
             @if(auth()->check() && auth()->user()->isAdmin())
-                <a href="{{ route('books.edit', $book) }}" class="btn-secondary px-3 py-2">Edit Buku</a>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('books.barcode.print', $book) }}" target="_blank" class="btn-secondary px-3 py-2">Cetak Barcode</a>
+                    <a href="{{ route('books.edit', $book) }}" class="btn-secondary px-3 py-2">Edit Buku</a>
+                </div>
             @endif
         </div>
 
@@ -45,6 +48,12 @@
                     <p class="mt-2 text-lg font-medium text-slate-600">oleh {{ $book->author }}</p>
 
                     <dl class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        @if($book->book_code)
+                            <div class="surface-soft p-4">
+                                <dt class="text-xs font-bold uppercase tracking-wide text-slate-500">Kode Buku</dt>
+                                <dd class="mt-1 font-semibold text-slate-900">{{ $book->book_code }}</dd>
+                            </div>
+                        @endif
                         @if($book->isbn)
                             <div class="surface-soft p-4">
                                 <dt class="text-xs font-bold uppercase tracking-wide text-slate-500">ISBN</dt>

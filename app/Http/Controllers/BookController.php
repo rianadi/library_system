@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Category;
+use App\Services\BookExcelImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class BookController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Book::select('id', 'title', 'author', 'isbn', 'year', 'category_id', 'total_copies', 'available_copies', 'cover_image')
+        $query = Book::select('id', 'book_code', 'title', 'author', 'isbn', 'year', 'category_id', 'total_copies', 'available_copies', 'cover_image')
             ->with('category:id,name', 'loans:id,user_id,book_id,status');
 
         if ($request->filled('search')) {
@@ -19,7 +22,8 @@ class BookController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', '%' . $search . '%')
                   ->orWhere('author', 'like', '%' . $search . '%')
-                  ->orWhere('isbn', 'like', '%' . $search . '%');
+                  ->orWhere('isbn', 'like', '%' . $search . '%')
+                  ->orWhere('book_code', 'like', '%' . $search . '%');
             });
         }
 
@@ -82,6 +86,42 @@ class BookController extends Controller
             ->with('success', 'Buku berhasil ditambahkan.');
     }
 
+    public function import(Request $request, BookExcelImportService $importer)
+    {
+        $request->validate([
+            'excel_file' => [
+                'required',
+                'file',
+                'max:5120',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! $value instanceof \Illuminate\Http\UploadedFile || strtolower($value->getClientOriginalExtension()) !== 'xlsx') {
+                        $fail('File harus berformat .xlsx.');
+                    }
+                },
+            ],
+        ]);
+
+        try {
+            $summary = $importer->import($request->file('excel_file')->getRealPath());
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return back()->with('error', 'Import gagal. Pastikan file Excel tidak rusak dan memakai format .xlsx.');
+        }
+
+        $message = "Import selesai: {$summary['imported']} buku berhasil ditambahkan.";
+
+        if ($summary['skipped'] > 0 || $summary['failed'] > 0) {
+            $message .= " {$summary['skipped']} baris dilewati, {$summary['failed']} baris gagal.";
+        }
+
+        return redirect()->route('books.index')
+            ->with('success', $message)
+            ->with('import_errors', $summary['errors']);
+    }
+
     public function edit(Book $book)
     {
         $categories = Category::orderBy('name')->get();
@@ -137,5 +177,54 @@ class BookController extends Controller
 
         return redirect()->route('books.index')
             ->with('success', 'Buku berhasil dihapus.');
+    }
+
+    public function printBarcode(Book $book)
+    {
+        $book->load('category:id,name');
+
+        return view('books.barcode-print', compact('book'));
+    }
+    
+    public function findByBarcode($code)
+    {
+        $book = Book::select(
+            'id',
+            'book_code',
+            'title',
+            'author',
+            'isbn',
+            'year',
+            'category_id',
+            'total_copies',
+            'available_copies',
+            'location'
+        )
+            ->with('category:id,name')
+            ->where('book_code', $code)
+            ->first();
+
+        if (! $book) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Buku tidak ditemukan.',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'book' => [
+                'id' => $book->id,
+                'book_code' => $book->book_code,
+                'title' => $book->title,
+                'author' => $book->author,
+                'isbn' => $book->isbn,
+                'year' => $book->year,
+                'category' => $book->category?->name,
+                'total_copies' => $book->total_copies,
+                'available_copies' => $book->available_copies,
+                'location' => $book->location,
+            ],
+        ]);
     }
 }
